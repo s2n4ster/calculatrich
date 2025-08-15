@@ -15,14 +15,13 @@
 ## 🚀 Установка и запуск
 
 ### Требования
-- Python 3.6+
-- tkinter (обычно входит в стандартную установку Python)
+- Python 3.6+ (tkinter входит в стандартную установку)
 
 ### Запуск
 ```bash
 # Клонировать репозиторий
-git clone https://github.com/s2n4ster/test.git
-cd test
+git clone https://github.com/s2n4ster/calculatrich.git
+cd calculatrich
 
 # Запустить калькулятор
 python calculator.py
