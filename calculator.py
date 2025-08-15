@@ -6,15 +6,15 @@ class ModernCalculator:
     def __init__(self, root):
         self.root = root
         self.root.title("Modern Calculator")
-        self.root.geometry("400x600")
+        self.root.geometry("400x650")
         self.root.resizable(False, False)
-        self.root.configure(bg='#f0f0f0')
         
         # Переменные для вычислений
         self.current_number = tk.StringVar(value="0")
         self.stored_number = 0
         self.operation = None
         self.new_number = True
+        self.history = []
         
         # Настройка стилей
         self.setup_styles()
@@ -25,59 +25,80 @@ class ModernCalculator:
         # Привязка клавиатуры
         self.bind_keyboard()
         
-    def setup_styles(self):
-        """Настройка стилей для кнопок"""
-        style = ttk.Style()
-        style.theme_use('clam')
+        # Центрирование окна
+        self.center_window()
         
-        # Стиль для дисплея
-        style.configure('Display.TLabel', 
-                       background='#ffffff', 
-                       foreground='#000000',
-                       font=('Segoe UI', 24, 'bold'),
-                       padding=20)
+    def setup_styles(self):
+        """Настройка стилей для кнопок с использованием ttk"""
+        style = ttk.Style()
+        
+        # Попробуем использовать современную тему
+        try:
+            style.theme_use('clam')
+        except:
+            style.theme_use('default')
+        
+        # Настройка стилей для разных типов кнопок
+        style.configure('Calculator.TFrame', background='#f0f0f0')
+        style.configure('Display.TFrame', background='#ffffff', relief='flat')
         
         # Стиль для кнопок с числами
         style.configure('Number.TButton',
                        background='#ffffff',
                        foreground='#000000',
-                       font=('Segoe UI', 16, 'bold'),
-                       padding=15)
+                       font=('Segoe UI', 18, 'bold'),
+                       padding=(20, 15),
+                       relief='flat')
         
         # Стиль для операторов
         style.configure('Operator.TButton',
                        background='#ff9500',
                        foreground='#ffffff',
-                       font=('Segoe UI', 16, 'bold'),
-                       padding=15)
+                       font=('Segoe UI', 18, 'bold'),
+                       padding=(20, 15),
+                       relief='flat')
         
         # Стиль для функций
         style.configure('Function.TButton',
                        background='#d4d4d2',
                        foreground='#000000',
-                       font=('Segoe UI', 16, 'bold'),
-                       padding=15)
+                       font=('Segoe UI', 18, 'bold'),
+                       padding=(20, 15),
+                       relief='flat')
         
         # Стиль для равно
         style.configure('Equals.TButton',
                        background='#ff9500',
                        foreground='#ffffff',
-                       font=('Segoe UI', 16, 'bold'),
-                       padding=15)
+                       font=('Segoe UI', 18, 'bold'),
+                       padding=(20, 15),
+                       relief='flat')
     
     def create_widgets(self):
         """Создание элементов интерфейса"""
         # Главный контейнер
-        main_frame = tk.Frame(self.root, bg='#f0f0f0')
-        main_frame.pack(fill='both', expand=True, padx=10, pady=10)
+        main_frame = ttk.Frame(self.root, style='Calculator.TFrame')
+        main_frame.pack(fill='both', expand=True, padx=15, pady=15)
         
         # Дисплей
-        display_frame = tk.Frame(main_frame, bg='#ffffff', relief='flat', bd=1)
+        display_frame = ttk.Frame(main_frame, style='Display.TFrame')
         display_frame.pack(fill='x', pady=(0, 20))
         
-        self.display_label = tk.Label(display_frame, 
+        # История вычислений
+        self.history_label = tk.Label(display_frame,
+                                    text="",
+                                    font=('Segoe UI', 14),
+                                    bg='#ffffff',
+                                    fg='#666666',
+                                    anchor='e',
+                                    padx=20,
+                                    pady=10)
+        self.history_label.pack(fill='x')
+        
+        # Основной дисплей
+        self.display_label = tk.Label(display_frame,
                                     textvariable=self.current_number,
-                                    font=('Segoe UI', 36, 'bold'),
+                                    font=('Segoe UI', 42, 'bold'),
                                     bg='#ffffff',
                                     fg='#000000',
                                     anchor='e',
@@ -86,7 +107,7 @@ class ModernCalculator:
         self.display_label.pack(fill='x')
         
         # Кнопки
-        buttons_frame = tk.Frame(main_frame, bg='#f0f0f0')
+        buttons_frame = ttk.Frame(main_frame, style='Calculator.TFrame')
         buttons_frame.pack(fill='both', expand=True)
         
         # Сетка кнопок
@@ -108,34 +129,16 @@ class ModernCalculator:
         for button_data in buttons:
             if len(button_data) == 5:  # Кнопка занимает 2 колонки
                 text, style_type, row, col, colspan = button_data
-                btn = tk.Button(buttons_frame, 
-                              text=text,
-                              font=('Segoe UI', 20, 'bold'),
-                              relief='flat',
-                              bd=0,
-                              padx=10,
-                              pady=10)
-                btn.grid(row=row, column=col, columnspan=colspan, sticky='nsew', padx=2, pady=2)
+                btn = ttk.Button(buttons_frame, 
+                               text=text,
+                               style=f'{style_type}.TButton')
+                btn.grid(row=row, column=col, columnspan=colspan, sticky='nsew', padx=3, pady=3)
             else:
                 text, style_type, row, col = button_data
-                btn = tk.Button(buttons_frame, 
-                              text=text,
-                              font=('Segoe UI', 20, 'bold'),
-                              relief='flat',
-                              bd=0,
-                              padx=10,
-                              pady=10)
-                btn.grid(row=row, column=col, sticky='nsew', padx=2, pady=2)
-            
-            # Применение стилей
-            if style_type == 'Number':
-                btn.configure(bg='#ffffff', fg='#000000', activebackground='#e6e6e6')
-            elif style_type == 'Operator':
-                btn.configure(bg='#ff9500', fg='#ffffff', activebackground='#e6850e')
-            elif style_type == 'Function':
-                btn.configure(bg='#d4d4d2', fg='#000000', activebackground='#c4c4c2')
-            elif style_type == 'Equals':
-                btn.configure(bg='#ff9500', fg='#ffffff', activebackground='#e6850e')
+                btn = ttk.Button(buttons_frame, 
+                               text=text,
+                               style=f'{style_type}.TButton')
+                btn.grid(row=row, column=col, sticky='nsew', padx=3, pady=3)
             
             # Привязка событий
             if text.isdigit() or text == '.':
@@ -150,6 +153,15 @@ class ModernCalculator:
                 btn.configure(command=self.negate)
             elif text == '%':
                 btn.configure(command=self.percent)
+    
+    def center_window(self):
+        """Центрирование окна на экране"""
+        self.root.update_idletasks()
+        width = self.root.winfo_width()
+        height = self.root.winfo_height()
+        x = (self.root.winfo_screenwidth() // 2) - (width // 2)
+        y = (self.root.winfo_screenheight() // 2) - (height // 2)
+        self.root.geometry(f'{width}x{height}+{x}+{y}')
     
     def number_click(self, number):
         """Обработка нажатия на цифру"""
@@ -173,6 +185,9 @@ class ModernCalculator:
         self.stored_number = float(self.current_number.get())
         self.operation = op
         self.new_number = True
+        
+        # Обновление истории
+        self.update_history(f"{self.stored_number} {op}")
     
     def calculate(self):
         """Выполнение вычисления"""
@@ -193,14 +208,20 @@ class ModernCalculator:
                 self.current_number.set("Error")
                 self.new_number = True
                 self.operation = None
+                self.update_history("Error")
                 return
             result = self.stored_number / current
         
         # Форматирование результата
         if result.is_integer():
-            self.current_number.set(str(int(result)))
+            result_str = str(int(result))
         else:
-            self.current_number.set(str(result))
+            result_str = str(round(result, 8)).rstrip('0').rstrip('.')
+        
+        self.current_number.set(result_str)
+        
+        # Обновление истории
+        self.update_history(f"{self.stored_number} {self.operation} {current} = {result_str}")
         
         self.operation = None
         self.new_number = True
@@ -211,6 +232,7 @@ class ModernCalculator:
         self.stored_number = 0
         self.operation = None
         self.new_number = True
+        self.update_history("")
     
     def negate(self):
         """Смена знака числа"""
@@ -224,7 +246,18 @@ class ModernCalculator:
         if result.is_integer():
             self.current_number.set(str(int(result)))
         else:
-            self.current_number.set(str(result))
+            self.current_number.set(str(round(result, 8)).rstrip('0').rstrip('.'))
+    
+    def update_history(self, text):
+        """Обновление истории вычислений"""
+        if text:
+            self.history.append(text)
+            if len(self.history) > 3:  # Показываем только последние 3 операции
+                self.history.pop(0)
+        
+        # Отображение истории
+        history_text = " | ".join(self.history[-2:]) if self.history else ""
+        self.history_label.config(text=history_text)
     
     def bind_keyboard(self):
         """Привязка клавиатуры"""
@@ -232,6 +265,7 @@ class ModernCalculator:
         self.root.bind('<Return>', lambda e: self.calculate())
         self.root.bind('<Escape>', lambda e: self.clear())
         self.root.bind('<BackSpace>', lambda e: self.backspace())
+        self.root.bind('<Delete>', lambda e: self.clear())
     
     def key_press(self, event):
         """Обработка нажатий клавиш"""

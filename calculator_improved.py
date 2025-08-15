@@ -92,7 +92,7 @@ class ModernCalculator:
                                     fg='#666666',
                                     anchor='e',
                                     padx=20,
-                                    pady=(10, 0))
+                                    pady=10)
         self.history_label.pack(fill='x')
         
         # Основной дисплей
@@ -103,7 +103,7 @@ class ModernCalculator:
                                     fg='#000000',
                                     anchor='e',
                                     padx=20,
-                                    pady=(5, 20))
+                                    pady=20)
         self.display_label.pack(fill='x')
         
         # Кнопки

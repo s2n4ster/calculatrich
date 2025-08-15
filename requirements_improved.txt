@@ -1,2 +1,0 @@
-tkinter
-ttkthemes>=3.2.2
