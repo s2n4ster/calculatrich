@@ -1,24 +1,25 @@
-import ttkbootstrap as ttk
-from ttkbootstrap.constants import *
+import customtkinter as ctk
 import math
 
-class WindowsCalculator:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("Calculator")
-        self.root.geometry("400x700")
+class ModernCalculator:
+    def __init__(self):
+        # Настройка темы
+        ctk.set_appearance_mode("dark")
+        ctk.set_default_color_theme("blue")
+        
+        # Создание окна
+        self.root = ctk.CTk()
+        self.root.title("Modern Calculator")
+        self.root.geometry("400x800")
         self.root.resizable(False, False)
         
         # Переменные для вычислений
-        self.current_number = ttk.StringVar(value="0")
+        self.current_number = ctk.StringVar(value="0")
         self.stored_number = 0
         self.operation = None
         self.new_number = True
         self.history = []
         self.memory = 0
-        
-        # Настройка темы
-        self.setup_theme()
         
         # Создание интерфейса
         self.create_widgets()
@@ -29,94 +30,186 @@ class WindowsCalculator:
         # Центрирование окна
         self.center_window()
         
-    def setup_theme(self):
-        """Настройка современной темы"""
-        self.root.style.theme_use("flatly")
-        
     def create_widgets(self):
-        """Создание элементов интерфейса в стиле Windows Calculator"""
+        """Создание современного интерфейса в стиле iPhone"""
         # Главный контейнер
-        main_frame = ttk.Frame(self.root, padding=10)
-        main_frame.pack(fill='both', expand=True)
+        main_frame = ctk.CTkFrame(self.root, fg_color="transparent")
+        main_frame.pack(fill='both', expand=True, padx=20, pady=20)
+        
+        # Вкладки
+        self.create_tabs(main_frame)
         
         # Дисплей
-        display_frame = ttk.Frame(main_frame)
+        self.create_display(main_frame)
+        
+        # Кнопки
+        self.create_buttons(main_frame)
+        
+    def create_tabs(self, parent):
+        """Создание современных вкладок"""
+        tab_frame = ctk.CTkFrame(parent, fg_color="transparent")
+        tab_frame.pack(fill='x', pady=(0, 20))
+        
+        # Создание вкладок
+        self.notebook = ctk.CTkTabview(tab_frame, fg_color="transparent")
+        self.notebook.pack(fill='x')
+        
+        # Стандартный калькулятор
+        self.standard_frame = self.notebook.add("Стандартный")
+        
+        # Инженерный калькулятор
+        self.engineering_frame = self.notebook.add("Инженерный")
+        
+        # Программист
+        self.programmer_frame = self.notebook.add("Программист")
+        
+    def create_display(self, parent):
+        """Создание современного дисплея"""
+        display_frame = ctk.CTkFrame(parent, fg_color="#1a1a1a", corner_radius=20)
         display_frame.pack(fill='x', pady=(0, 20))
         
         # История вычислений
-        self.history_label = ttk.Label(display_frame,
-                                     text="",
-                                     font=("Segoe UI", 12),
-                                     anchor='e',
-                                     padding=(20, 10, 20, 5))
-        self.history_label.pack(fill='x')
+        self.history_label = ctk.CTkLabel(display_frame,
+                                        text="",
+                                        font=ctk.CTkFont(family="SF Pro Display", size=16),
+                                        text_color="#8e8e93",
+                                        anchor='e')
+        self.history_label.pack(fill='x', padx=25, pady=(15, 5))
         
         # Основной дисплей
-        self.display_label = ttk.Label(display_frame,
-                                    textvariable=self.current_number,
-                                    font=("Segoe UI", 48, "bold"),
-                                    anchor='e',
-                                    padding=(20, 5, 20, 20))
-        self.display_label.pack(fill='x')
+        self.display_label = ctk.CTkLabel(display_frame,
+                                        textvariable=self.current_number,
+                                        font=ctk.CTkFont(family="SF Pro Display", size=48, weight="bold"),
+                                        text_color="#ffffff",
+                                        anchor='e')
+        self.display_label.pack(fill='x', padx=25, pady=(0, 20))
         
-        # Кнопки
-        buttons_frame = ttk.Frame(main_frame)
+    def create_buttons(self, parent):
+        """Создание кнопок для разных режимов"""
+        # Стандартные кнопки
+        self.create_standard_buttons()
+        
+        # Инженерные кнопки
+        self.create_engineering_buttons()
+        
+        # Кнопки программиста
+        self.create_programmer_buttons()
+        
+    def create_standard_buttons(self):
+        """Создание стандартных кнопок в стиле iPhone"""
+        buttons_frame = ctk.CTkFrame(self.standard_frame, fg_color="transparent")
         buttons_frame.pack(fill='both', expand=True)
         
-        # Сетка кнопок (точно как в Windows Calculator)
+        # Сетка кнопок (как в iPhone)
         buttons = [
-            # Первый ряд: память и функции
-            ('MC', 'Function', 0, 0), ('MR', 'Function', 0, 1), ('M+', 'Function', 0, 2), ('M-', 'Function', 0, 3),
-            ('MS', 'Function', 0, 4), ('M▾', 'Function', 0, 5),
-            
-            # Второй ряд: функции
-            ('%', 'Function', 1, 0), ('CE', 'Function', 1, 1), ('C', 'Function', 1, 2), ('⌫', 'Function', 1, 3),
-            ('±', 'Function', 1, 4), ('÷', 'Operator', 1, 5),
-            
-            # Третий ряд: цифры и операторы
-            ('7', 'Number', 2, 0), ('8', 'Number', 2, 1), ('9', 'Number', 2, 2), ('×', 'Operator', 2, 3),
-            ('1/x', 'Function', 2, 4), ('x²', 'Function', 2, 5),
-            
-            # Четвертый ряд
-            ('4', 'Number', 3, 0), ('5', 'Number', 3, 1), ('6', 'Number', 3, 2), ('−', 'Operator', 3, 3),
-            ('√', 'Function', 3, 4), ('=', 'Equals', 3, 5),
-            
-            # Пятый ряд
-            ('1', 'Number', 4, 0), ('2', 'Number', 4, 1), ('3', 'Number', 4, 2), ('+', 'Operator', 4, 3),
-            ('0', 'Number', 5, 0, 2), ('.', 'Number', 5, 2), ('=', 'Equals', 5, 3)
+            ('C', 'Function', 0, 0), ('±', 'Function', 0, 1), ('%', 'Function', 0, 2), ('÷', 'Operator', 0, 3),
+            ('7', 'Number', 1, 0), ('8', 'Number', 1, 1), ('9', 'Number', 1, 2), ('×', 'Operator', 1, 3),
+            ('4', 'Number', 2, 0), ('5', 'Number', 2, 1), ('6', 'Number', 2, 2), ('−', 'Operator', 2, 3),
+            ('1', 'Number', 3, 0), ('2', 'Number', 3, 1), ('3', 'Number', 3, 2), ('+', 'Operator', 3, 3),
+            ('0', 'Number', 4, 0, 2), ('.', 'Number', 4, 2), ('=', 'Equals', 4, 3)
         ]
         
         # Настройка сетки
-        for i in range(6):
+        for i in range(5):
             buttons_frame.grid_rowconfigure(i, weight=1)
-        for i in range(6):
+        for i in range(4):
             buttons_frame.grid_columnconfigure(i, weight=1)
         
         # Создание кнопок
         for button_data in buttons:
-            if len(button_data) == 6:  # Кнопка занимает 2 колонки
-                text, style_type, row, col, colspan, _ = button_data
-                btn = self.create_button(buttons_frame, text, style_type)
-                btn.grid(row=row, column=col, columnspan=colspan, sticky='nsew', padx=2, pady=2)
+            if len(button_data) == 5:  # Кнопка занимает 2 колонки
+                text, style_type, row, col, colspan = button_data
+                btn = self.create_button_widget(buttons_frame, text, style_type)
+                btn.grid(row=row, column=col, columnspan=colspan, sticky='nsew', padx=4, pady=4)
             else:
                 text, style_type, row, col = button_data
-                btn = self.create_button(buttons_frame, text, style_type)
-                btn.grid(row=row, column=col, sticky='nsew', padx=2, pady=2)
+                btn = self.create_button_widget(buttons_frame, text, style_type)
+                btn.grid(row=row, column=col, sticky='nsew', padx=4, pady=4)
     
-    def create_button(self, parent, text, style_type):
-        """Создание кнопки с соответствующим стилем"""
+    def create_engineering_buttons(self):
+        """Создание инженерных кнопок"""
+        buttons_frame = ctk.CTkFrame(self.engineering_frame, fg_color="transparent")
+        buttons_frame.pack(fill='both', expand=True)
+        
+        # Сетка инженерных кнопок
+        buttons = [
+            ('sin', 'Scientific', 0, 0), ('cos', 'Scientific', 0, 1), ('tan', 'Scientific', 0, 2), ('log', 'Scientific', 0, 3),
+            ('ln', 'Scientific', 1, 0), ('x²', 'Scientific', 1, 1), ('x³', 'Scientific', 1, 2), ('√', 'Scientific', 1, 3),
+            ('1/x', 'Scientific', 2, 0), ('x^y', 'Scientific', 2, 1), ('e^x', 'Scientific', 2, 2), ('10^x', 'Scientific', 2, 3),
+            ('π', 'Scientific', 3, 0), ('e', 'Scientific', 3, 1), ('n!', 'Scientific', 3, 2), ('mod', 'Scientific', 3, 3),
+            ('(', 'Scientific', 4, 0), (')', 'Scientific', 4, 1), ('C', 'Function', 4, 2), ('=', 'Equals', 4, 3)
+        ]
+        
+        # Настройка сетки
+        for i in range(5):
+            buttons_frame.grid_rowconfigure(i, weight=1)
+        for i in range(4):
+            buttons_frame.grid_columnconfigure(i, weight=1)
+        
+        # Создание кнопок
+        for button_data in buttons:
+            text, style_type, row, col = button_data
+            btn = self.create_button_widget(buttons_frame, text, style_type)
+            btn.grid(row=row, column=col, sticky='nsew', padx=4, pady=4)
+    
+    def create_programmer_buttons(self):
+        """Создание кнопок программиста"""
+        buttons_frame = ctk.CTkFrame(self.programmer_frame, fg_color="transparent")
+        buttons_frame.pack(fill='both', expand=True)
+        
+        # Сетка кнопок программиста
+        buttons = [
+            ('HEX', 'Function', 0, 0), ('DEC', 'Function', 0, 1), ('OCT', 'Function', 0, 2), ('BIN', 'Function', 0, 3),
+            ('AND', 'Scientific', 1, 0), ('OR', 'Scientific', 1, 1), ('XOR', 'Scientific', 1, 2), ('NOT', 'Scientific', 1, 3),
+            ('LSH', 'Scientific', 2, 0), ('RSH', 'Scientific', 2, 1), ('ROL', 'Scientific', 2, 2), ('ROR', 'Scientific', 2, 3),
+            ('A', 'Scientific', 3, 0), ('B', 'Scientific', 3, 1), ('C', 'Scientific', 3, 2), ('D', 'Scientific', 3, 3),
+            ('E', 'Scientific', 4, 0), ('F', 'Scientific', 4, 1), ('C', 'Function', 4, 2), ('=', 'Equals', 4, 3)
+        ]
+        
+        # Настройка сетки
+        for i in range(5):
+            buttons_frame.grid_rowconfigure(i, weight=1)
+        for i in range(4):
+            buttons_frame.grid_columnconfigure(i, weight=1)
+        
+        # Создание кнопок
+        for button_data in buttons:
+            text, style_type, row, col = button_data
+            btn = self.create_button_widget(buttons_frame, text, style_type)
+            btn.grid(row=row, column=col, sticky='nsew', padx=4, pady=4)
+    
+    def create_button_widget(self, parent, text, style_type):
+        """Создание современной кнопки с соответствующим стилем"""
         if style_type == 'Number':
-            btn = ttk.Button(parent, text=text, bootstyle="primary", width=8)
+            btn = ctk.CTkButton(parent, text=text, 
+                               font=ctk.CTkFont(family="SF Pro Display", size=24, weight="bold"),
+                               fg_color="#333333", hover_color="#444444",
+                               corner_radius=25, height=60)
             btn.configure(command=lambda t=text: self.number_click(t))
         elif style_type == 'Operator':
-            btn = ttk.Button(parent, text=text, bootstyle="secondary", width=8)
+            btn = ctk.CTkButton(parent, text=text, 
+                               font=ctk.CTkFont(family="SF Pro Display", size=24, weight="bold"),
+                               fg_color="#ff9500", hover_color="#ffaa33",
+                               corner_radius=25, height=60)
             btn.configure(command=lambda op=text: self.operator_click(op))
         elif style_type == 'Function':
-            btn = ttk.Button(parent, text=text, bootstyle="light", width=8)
+            btn = ctk.CTkButton(parent, text=text, 
+                               font=ctk.CTkFont(family="SF Pro Display", size=20, weight="bold"),
+                               fg_color="#a5a5a5", hover_color="#b5b5b5",
+                               corner_radius=25, height=60)
             btn.configure(command=lambda f=text: self.function_click(f))
         elif style_type == 'Equals':
-            btn = ttk.Button(parent, text=text, bootstyle="success", width=8)
+            btn = ctk.CTkButton(parent, text=text, 
+                               font=ctk.CTkFont(family="SF Pro Display", size=24, weight="bold"),
+                               fg_color="#ff9500", hover_color="#ffaa33",
+                               corner_radius=25, height=60)
             btn.configure(command=self.calculate)
+        elif style_type == 'Scientific':
+            btn = ctk.CTkButton(parent, text=text, 
+                               font=ctk.CTkFont(family="SF Pro Display", size=18, weight="bold"),
+                               fg_color="#2d2d2d", hover_color="#3d3d3d",
+                               corner_radius=20, height=50)
+            btn.configure(command=lambda f=text: self.scientific_click(f))
         
         return btn
     
@@ -128,7 +221,7 @@ class WindowsCalculator:
         x = (self.root.winfo_screenwidth() // 2) - (width // 2)
         y = (self.root.winfo_screenheight() // 2) - (height // 2)
         self.root.geometry(f'{width}x{height}+{x}+{y}')
-    
+        
     def number_click(self, number):
         """Обработка нажатия на цифру"""
         if self.new_number:
@@ -157,28 +250,51 @@ class WindowsCalculator:
     
     def function_click(self, func):
         """Обработка нажатия на функцию"""
-        current = float(self.current_number.get())
+        try:
+            current = float(self.current_number.get())
+        except ValueError:
+            # Если не удается преобразовать в число (например, только точка), очищаем
+            self.current_number.set("0")
+            current = 0
         
         if func == 'C':
             self.clear()
-        elif func == 'CE':
-            self.current_number.set("0")
-            self.new_number = True
-        elif func == '⌫':
-            self.backspace()
         elif func == '±':
             self.current_number.set(str(-current))
         elif func == '%':
             result = current / 100
             self.current_number.set(self.format_number(result))
-        elif func == '1/x':
-            if current != 0:
-                result = 1 / current
+    
+    def scientific_click(self, func):
+        """Обработка нажатия на научную функцию"""
+        current = float(self.current_number.get())
+        
+        if func == 'sin':
+            result = math.sin(math.radians(current))
+            self.current_number.set(self.format_number(result))
+        elif func == 'cos':
+            result = math.cos(math.radians(current))
+            self.current_number.set(self.format_number(result))
+        elif func == 'tan':
+            result = math.tan(math.radians(current))
+            self.current_number.set(self.format_number(result))
+        elif func == 'log':
+            if current > 0:
+                result = math.log10(current)
+                self.current_number.set(self.format_number(result))
+            else:
+                self.current_number.set("Error")
+        elif func == 'ln':
+            if current > 0:
+                result = math.log(current)
                 self.current_number.set(self.format_number(result))
             else:
                 self.current_number.set("Error")
         elif func == 'x²':
             result = current ** 2
+            self.current_number.set(self.format_number(result))
+        elif func == 'x³':
+            result = current ** 3
             self.current_number.set(self.format_number(result))
         elif func == '√':
             if current >= 0:
@@ -186,17 +302,24 @@ class WindowsCalculator:
                 self.current_number.set(self.format_number(result))
             else:
                 self.current_number.set("Error")
-        elif func == 'MC':
-            self.memory = 0
-        elif func == 'MR':
-            self.current_number.set(str(self.memory))
+        elif func == '1/x':
+            if current != 0:
+                result = 1 / current
+                self.current_number.set(self.format_number(result))
+            else:
+                self.current_number.set("Error")
+        elif func == 'π':
+            self.current_number.set(str(math.pi))
             self.new_number = True
-        elif func == 'M+':
-            self.memory += current
-        elif func == 'M-':
-            self.memory -= current
-        elif func == 'MS':
-            self.memory = current
+        elif func == 'e':
+            self.current_number.set(str(math.e))
+            self.new_number = True
+        elif func == 'n!':
+            if current >= 0 and current.is_integer():
+                result = math.factorial(int(current))
+                self.current_number.set(str(result))
+            else:
+                self.current_number.set("Error")
     
     def calculate(self):
         """Выполнение вычисления"""
@@ -247,14 +370,6 @@ class WindowsCalculator:
         self.new_number = True
         self.update_history("")
     
-    def backspace(self):
-        """Удаление последнего символа"""
-        current = self.current_number.get()
-        if len(current) > 1:
-            self.current_number.set(current[:-1])
-        else:
-            self.current_number.set("0")
-    
     def update_history(self, text):
         """Обновление истории вычислений"""
         if text:
@@ -264,17 +379,13 @@ class WindowsCalculator:
         
         # Отображение истории
         history_text = " | ".join(self.history) if self.history else ""
-        self.history_label.config(text=history_text)
+        self.history_label.configure(text=history_text)
     
     def bind_keyboard(self):
         """Привязка клавиатуры"""
         self.root.bind('<Key>', self.key_press)
         self.root.bind('<Return>', lambda e: self.calculate())
-        self.root.bind('<KP_Enter>', lambda e: self.calculate())
         self.root.bind('<Escape>', lambda e: self.clear())
-        self.root.bind('<BackSpace>', lambda e: self.backspace())
-        self.root.bind('<Delete>', lambda e: self.clear())
-        self.root.bind('<KeyPress>', self.key_press)
     
     def key_press(self, event):
         """Обработка нажатий клавиш"""
@@ -291,9 +402,8 @@ class WindowsCalculator:
             self.function_click('%')
 
 def main():
-    root = ttk.Window(themename="flatly")
-    app = WindowsCalculator(root)
-    root.mainloop()
+    app = ModernCalculator()
+    app.root.mainloop()
 
 if __name__ == "__main__":
     main()
