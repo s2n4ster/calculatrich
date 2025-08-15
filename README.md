@@ -9,14 +9,3 @@ git clone https://github.com/s2n4ster/calculatrich.git
 cd calculatrich
 python calculator.py
 ```
-
-## Функции
-
-- Основные математические операции
-- Поддержка клавиатуры
-- История вычислений
-- Современный дизайн
-
-## Лицензия
-
-MIT
